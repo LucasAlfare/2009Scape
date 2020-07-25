@@ -11,6 +11,7 @@ import core.game.container.Container;
 import core.game.container.impl.BankContainer;
 import core.game.container.impl.EquipmentContainer;
 import core.game.container.impl.InventoryListener;
+import core.game.node.entity.combat.equipment.EquipmentDegrader;
 import plugin.ame.AntiMacroHandler;
 import plugin.dialogue.DialogueInterpreter;
 import plugin.ge.GrandExchange;
@@ -120,6 +121,8 @@ public class Player extends Entity {
 	public boolean newPlayer = getSkills().getTotalLevel() < 50;
 
 	public BankContainer dropLog = new BankContainer(this);
+
+	public EquipmentDegrader degrader = new EquipmentDegrader();
 
 	/**
 	 * The inventory.
@@ -438,6 +441,7 @@ public class Player extends Entity {
 		super.tick();
 		antiMacroHandler.pulse();
 		hunterManager.pulse();
+		musicPlayer.tick();
 		if (!artificial && (System.currentTimeMillis() - getSession().getLastPing()) > 20_000L) {
 			details.getSession().disconnect();
 			getSession().setLastPing(Long.MAX_VALUE);
@@ -696,7 +700,7 @@ public class Player extends Entity {
 				getImpactHandler().handleRecoilEffect(entity, state.getSecondaryHit());
 			}
 		}
-		DegradableEquipment.degrade(this, entity, false);
+		degrader.checkArmourDegrades(this);
 	}
 
 	/**
